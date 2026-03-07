@@ -3,11 +3,12 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "./",
+  base: "/COCOMO_Estimator/",
   build: {
     sourcemap: false,
     outDir: "dist",
-    assetsDir: "assets"
+    assetsDir: "assets",
+    emptyOutDir: true
   },
   server: {
     port: 5173,
