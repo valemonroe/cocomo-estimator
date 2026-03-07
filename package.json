@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy": "gh-pages -d dist",
     "electron-dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron-build": "npm run build && electron-builder",
     "preview": "vite preview",
@@ -25,7 +26,6 @@
     "concurrently": "^9.2.1",
     "electron": "^40.6.1",
     "electron-builder": "^26.8.1",
-    "gh-pages": "^6.3.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^1.5.0",
