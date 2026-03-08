@@ -4,7 +4,8 @@ import { defaults } from "./data/defaults";
 import { RANGES, validateNumber } from "./data/ranges";
 // ===== V2 ADDITIONS END: range validation imports =====
 import { help, HelpEntry } from "./data/help";
-import { CocomoInputs, calcAll, round0, round1, HOURS_PER_YEAR, B_BASE } from "./model/cocomo";
+import { CocomoInputs, calcAll, calcAAF, round0, round1, HOURS_PER_YEAR, B_BASE } from "./model/cocomo";
+//import { CocomoInputs, calcAll, round0, round1, HOURS_PER_YEAR, B_BASE } from "./model/cocomo";
 // ===== V3 ADDITIONS START: Excel export =====
 import { exportEstimatorToExcel } from "./exportExcel";
 // ===== V3 ADDITIONS END: Excel export =====
@@ -76,7 +77,6 @@ function HelpIcon({ entry }: { entry: HelpEntry }) {
     </span>
   );
 }
-
 function NumField(props: {
   label: string;
   value: number;
@@ -85,56 +85,26 @@ function NumField(props: {
   min?: number;
   max?: number;
   helpKey?: string;
-  rangeId?: string; // optional ID to validate against RANGES rules 
+  rangeId?: string;
+  formulaText?: React.ReactNode;
 }) {
   const entry = props.helpKey ? help[props.helpKey] : undefined;
-  // ===== V2 ADDITIONS START: range validation wiring =====
 
-const range = props.rangeId ? RANGES[props.rangeId] : undefined;
+  const range = props.rangeId ? RANGES[props.rangeId] : undefined;
 
-const err =
-  props.rangeId && range
-    ? validateNumber(props.rangeId, props.value)
-    : null;
+  const err =
+    props.rangeId && range
+      ? validateNumber(props.rangeId, props.value)
+      : null;
 
-const handleChange = (raw: string) => {
-  const value = Number(raw);
-  props.onChange(value);
-};
+  const handleChange = (raw: string) => {
+    const value = Number(raw);
+    props.onChange(value);
+  };
 
-const handleBlur = () => {
-  // keep value; error message guides correction
-};
-
-  // ===== V2 ADDITIONS END: range validation wiring =====
-return (
-  <div className="field">
-    <div className="labelRow">
-      <span className="labelText">{props.label}</span>
-      {entry ? <HelpIcon entry={entry} /> : null}
-    </div>
-
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <input
-        className={`input ${err ? "inputError" : ""}`}
-        type="number"
-        value={Number.isFinite(props.value) ? props.value : 0}
-        step={props.step ?? 1}
-        min={range?.min}
-        max={range?.max}
-        onChange={(e) => handleChange(e.target.value)}
-        onBlur={handleBlur}
-        aria-invalid={!!err}
-      />
-
-      {err ? <div className="errorMsg">{err}</div> : null}
-    </div>
-  </div>
-    );
-}
-
-function ReadOnlyField(props: { label: string; value: string; helpKey?: string }) {
-  const entry = props.helpKey ? help[props.helpKey] : undefined;
+  const handleBlur = () => {
+    // keep value; error message guides correction
+  };
 
   return (
     <div className="field">
@@ -142,9 +112,81 @@ function ReadOnlyField(props: { label: string; value: string; helpKey?: string }
         <span className="labelText">{props.label}</span>
         {entry ? <HelpIcon entry={entry} /> : null}
       </div>
-      <div className="roValue">{props.value}</div>
+
+      {props.formulaText ? <FormulaText>{props.formulaText}</FormulaText> : null}
+
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <input
+          className={`input ${err ? "inputError" : ""}`}
+          type="number"
+          value={Number.isFinite(props.value) ? props.value : 0}
+          step={props.step ?? 1}
+          min={range?.min}
+          max={range?.max}
+          onChange={(e) => handleChange(e.target.value)}
+          onBlur={handleBlur}
+          aria-invalid={!!err}
+        />
+
+        {err ? <div className="errorMsg">{err}</div> : null}
+      </div>
     </div>
   );
+}
+
+function FormulaText(props: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        marginTop: 4,
+        fontSize: 12,
+        lineHeight: 1.4,
+        color: "var(--wm-muted)",
+        whiteSpace: "pre-line",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+}
+
+function ReadOnlyField(props:{
+  label:string
+  value:string
+  helpKey?:string
+  formula?:React.ReactNode
+}){
+
+  const entry = props.helpKey ? help[props.helpKey] : undefined
+
+  return(
+
+    <div className="calcField">
+
+      {/* LABEL + VALUE */}
+      <div className="calcLabelRow">
+
+        <div className="calcLabel">
+          {props.label}
+          {entry ? <HelpIcon entry={entry}/> : null}
+        </div>
+
+        <div className="calcValue">
+          {props.value}
+        </div>
+
+      </div>
+
+      {/* FORMULA / DESCRIPTION */}
+      {props.formula &&
+        <div className="calcFormula">
+          {props.formula}
+        </div>
+      }
+
+    </div>
+
+  )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -377,6 +419,7 @@ export default function App() {
             <div style={{ color: "var(--wm-muted)", fontSize: 13 }}>
               Hover the <b>?</b> next to an input to see recommended ranges and the rating-name → numeric scale.
             </div>
+
           </Section>
         ) : null}
 
@@ -405,9 +448,30 @@ export default function App() {
             </FormGrid>
 
             <hr className="hr" />
+
+                  <ReadOnlyField
+                  label="Adaptation Adjustment Factor (AAF)"
+                  value={fmtNum(calcAAF(m.esloc.dm,m.esloc.cm,m.esloc.im))}
+                  formula={
+                  <>
+                  The AAF is a weighted percentage of the modifications.
+
+                  AAF = (0.4 × DM) + (0.3 × CM) + (0.3 × IM)
+                  </>
+                  }
+                  />
             <div style={{ fontWeight: 900, color: "var(--wm-navy)" }}>
-              Equivalent New Size (ESLOC): {round1(r.eslocKsloc)} KSLOC
+                  <ReadOnlyField
+                  label="Equivalent Source Lines of Code (ESLOC)"
+                  value={`${fmtNum(r.eslocKsloc)} KSLOC`}
+                  formula={
+                  <>
+                  ESLOC = KSLOC × [AA + AAF × (1 + (0.02 × SU × UNFM))] / 100
+                  </>
+                  }
+                  />
             </div>
+
           </Section>
         ) : null}
 
@@ -433,14 +497,35 @@ export default function App() {
 
             <hr className="hr" />
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--wm-muted)", fontWeight: 800 }}>ΣSF</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--wm-navy)" }}>{fmtNum(round1(r.sumSF))}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--wm-muted)", fontWeight: 800 }}>Exponent E</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--wm-navy)" }}>{fmtNum(r.exponentE)}</div>
-              </div>
+                <FormGrid count={2}>
+
+                <ReadOnlyField
+                label="Σ Scale Factors (ΣSF)"
+                value={fmtNum(r.sumSF)}
+                formula={
+                <>
+                Sum of the five scale factor weights.
+
+                ΣSF = PREC + FLEX + RESL + TEAM + PMAT
+                </>
+                }
+                />
+
+                <ReadOnlyField
+                label="Exponent E"
+                value={fmtNum(r.exponentE)}
+                formula={
+                <>
+                Effort exponent used in the COCOMO II effort equation.
+
+                E = B + (0.01 × ΣSF)
+
+                B = 0.91
+                </>
+                }
+                />
+
+                </FormGrid>
             </div>
           </Section>
         ) : null}

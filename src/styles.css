@@ -477,3 +477,66 @@ body{
   color:#c62828;
   margin-top:4px;
 }
+/* =====================================
+   CALCULATED FIELD FORMULA DISPLAY
+===================================== */
+
+.formulaBox{
+  grid-column:1 / 2;
+  margin-top:6px;
+  margin-bottom:6px;
+  padding:8px 10px;
+
+  font-size:12px;
+  line-height:1.45;
+
+  color:var(--wm-muted);
+
+  border:1px solid var(--wm-border);
+  border-radius:8px;
+
+  background:#f9fbfd;
+}
+
+/* =====================================
+   CALCULATED FIELD LAYOUT
+===================================== */
+
+.calcField{
+  margin-top:10px;
+}
+
+.calcLabelRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.calcLabel{
+  font-weight:700;
+  color:var(--wm-navy);
+}
+
+.calcValue{
+  padding:6px 12px;
+  border:1px dashed var(--wm-border);
+  border-radius:8px;
+  background:#f5f7fa;
+  font-weight:600;
+  min-width:90px;
+  text-align:right;
+}
+
+.calcFormula{
+  margin-top:4px;
+  padding:8px 10px;
+  font-size:12px;
+  line-height:1.45;
+  color:var(--wm-muted);
+
+  border:1px solid var(--wm-border);
+  border-radius:8px;
+  background:#f9fbfd;
+
+  max-width:420px;
+}
