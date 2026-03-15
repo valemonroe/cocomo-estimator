@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/COCOMO_Estimator/",
+  base: "/cocomo_estimator/",
   build: {
     sourcemap: false,
     outDir: "dist",

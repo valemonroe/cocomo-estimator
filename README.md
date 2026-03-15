@@ -24,6 +24,11 @@ Package (creates installer via electron-builder):
 ```bash
 npm run electron-build
 ```
+### Build and Deploy to gh-pages
+```bash
+npm run build
+npm run deploy
+```
 
 ## Enterprise deployment bundle
 Creates a zip of the `dist/` output plus deployment notes:
