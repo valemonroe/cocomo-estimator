@@ -25,7 +25,7 @@ export const defaults: CocomoInputs = {
     prec: 2,
     flex: 1.5,
     resl: 1.5,
-    team: 0.78,
+    team: 1.1,
     pmat: 4.5,
   },
   effortMultipliers: {
@@ -38,14 +38,14 @@ export const defaults: CocomoInputs = {
     stor: 1.0,
     pvol: 1.05,
     acap: 0.75,
-    pcap: 0.75,
+    pcap: 0.76,
     pcon: 0.85,
     tool: 0.8,
     site: 1.0,
     sced: 1.0,
   },
   calibration: {
-    a: 2.4,
+    a: 2.94,
     bBase: 0.91,
   },
   resources: {

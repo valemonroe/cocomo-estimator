@@ -20,12 +20,23 @@ function fmtNum(x: number) {
 }
 
 function Pill({ impact }: { impact: string }) {
-  const cls = impact.startsWith("Good")
-    ? "pill good"
-    : impact.startsWith("Bad")
-      ? "pill bad"
-      : "pill neutral";
-  return <span className={cls}>{impact}</span>;
+  let color = "neutral";
+  let icon = "⭕";
+  let label = impact;
+
+  // Determine color and display icon based on impact emoji
+  if (impact === "🥇" || impact === "🥈" || impact === "🥉") {
+    color = "good";
+    icon = impact;
+  } else if (impact === "⚠️" || impact === "🚫" || impact === "🔥") {
+    color = "bad";
+    icon = impact;
+  } else {
+    color = "neutral";
+    icon = impact;
+  }
+
+  return <span className={`pill ${color}`} title={label}>{icon}</span>;
 }
 
 function HelpIcon({ entry }: { entry: HelpEntry }) {
@@ -161,28 +172,22 @@ function ReadOnlyField(props:{
 
   return(
 
-    <div className="calcField">
+    <div className={props.formula ? "calcField calcFieldFormula" : "calcField"}>
 
-      {/* LABEL + VALUE */}
-      <div className="calcLabelRow">
-
-        <div className="calcLabel">
-          {props.label}
-          {entry ? <HelpIcon entry={entry}/> : null}
-        </div>
-
-        <div className="calcValue">
-          {props.value}
-        </div>
-
+      <div className="calcLabel">
+        {props.label}
+        {entry ? <HelpIcon entry={entry}/> : null}
       </div>
 
-      {/* FORMULA / DESCRIPTION */}
       {props.formula &&
         <div className="calcFormula">
           {props.formula}
         </div>
       }
+
+      <div className="calcValue">
+        {props.value}
+      </div>
 
     </div>
 
@@ -425,53 +430,47 @@ export default function App() {
 
         {step === 1 ? (
           <Section title={steps[1].title}>
-            <FormGrid count={7}>
-              <NumField
-                label="Legacy LOC (ASLOC)"
-                value={m.esloc.asloc}
-                onChange={(v) =>
-                  setM({
-                    ...m,
-                    esloc: { ...m.esloc, asloc: v },
-                    assumptions: { ...m.assumptions, totalLoc: v },
-                  })
-                }
-                helpKey="asloc"
-                rangeId="esloc.asloc"
-              />
-              <NumField label="Design Modified % (DM)" value={m.esloc.dm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, dm: v } })} step={0.1} min={0} max={100} helpKey="dm" rangeId="esloc.dm" />
-              <NumField label="Code Modified % (CM)" value={m.esloc.cm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, cm: v } })} step={0.1} min={0} max={100} helpKey="cm" rangeId="esloc.cm" />
-              <NumField label="Integration Modified % (IM)" value={m.esloc.im} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, im: v } })} step={0.1} min={0} max={100} helpKey="im" rangeId="esloc.im" />
-              <NumField label="Assessment & Assimilation % (AA)" value={m.esloc.aa} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, aa: v } })} step={0.1} min={0} helpKey="aa" rangeId="esloc.aa" />
-              <NumField label="Software Understanding % (SU)" value={m.esloc.su} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, su: v } })} step={0.1} min={0} helpKey="su" rangeId="esloc.su" />
-              <NumField label="Programmer Unfamiliarity (UNFM) 0–1" value={m.esloc.unfm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, unfm: v } })} step={0.01} min={0} max={1} helpKey="unfm" rangeId="esloc.unfm" />
-            </FormGrid>
-
-            <hr className="hr" />
-
-                  <ReadOnlyField
-                  label="Adaptation Adjustment Factor (AAF)"
-                  value={fmtNum(calcAAF(m.esloc.dm,m.esloc.cm,m.esloc.im))}
-                  formula={
-                  <>
-                  The AAF is a weighted percentage of the modifications.
-
-                  AAF = (0.4 × DM) + (0.3 × CM) + (0.3 × IM)
-                  </>
+            <div className="formGrid twoCol">
+              <div style={{ display: "grid", gap: 10 }}>
+                <NumField
+                  label="Legacy LOC (ASLOC)"
+                  value={m.esloc.asloc}
+                  onChange={(v) =>
+                    setM({
+                      ...m,
+                      esloc: { ...m.esloc, asloc: v },
+                      assumptions: { ...m.assumptions, totalLoc: v },
+                    })
                   }
-                  />
-            <div style={{ fontWeight: 900, color: "var(--wm-navy)" }}>
-                  <ReadOnlyField
-                  label="Equivalent Source Lines of Code (ESLOC)"
-                  value={`${fmtNum(r.eslocKsloc)} KSLOC`}
-                  formula={
-                  <>
-                  ESLOC = KSLOC × [AA + AAF × (1 + (0.02 × SU × UNFM))] / 100
-                  </>
-                  }
-                  />
+                  helpKey="asloc"
+                  rangeId="esloc.asloc"
+                />
+                <NumField label="Design Modified % (DM)" value={m.esloc.dm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, dm: v } })} step={0.1} min={0} max={100} helpKey="dm" rangeId="esloc.dm" />
+                <NumField label="Code Modified % (CM)" value={m.esloc.cm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, cm: v } })} step={0.1} min={0} max={100} helpKey="cm" rangeId="esloc.cm" />
+              </div>
+
+              <div style={{ display: "grid", gap: 10 }}>
+                <NumField label="Integration Modified % (IM)" value={m.esloc.im} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, im: v } })} step={0.1} min={0} max={100} helpKey="im" rangeId="esloc.im" />
+                <NumField label="Assessment & Assimilation % (AA)" value={m.esloc.aa} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, aa: v } })} step={0.1} min={0} helpKey="aa" rangeId="esloc.aa" />
+                <NumField label="Software Understanding % (SU)" value={m.esloc.su} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, su: v } })} step={0.1} min={0} helpKey="su" rangeId="esloc.su" />
+                <NumField label="Programmer Unfamiliarity (UNFM) 0–1" value={m.esloc.unfm} onChange={(v) => setM({ ...m, esloc: { ...m.esloc, unfm: v } })} step={0.01} min={0} max={1} helpKey="unfm" rangeId="esloc.unfm" />
+              </div>
             </div>
+            <hr className="hr" />
+            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontWeight: 700, minWidth: "140px" }}>Adapt. Adj. Factor (AAF):</span>
+                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>{fmtNum(calcAAF(m.esloc.dm,m.esloc.cm,m.esloc.im))}</span>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}> = (0.4 × DM) + (0.3 × CM) + (0.3 × IM)</span>
+                </div>
 
+                <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontWeight: 700, minWidth: "100px" }}>Equivalent SLOC (ESLOC):</span>
+                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>{`${fmtNum(r.eslocKsloc)} KSLOC`}</span>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>=  KSLOC × [AA + AAF × (1 + (0.02 × SU × UNFM))] / 100</span>
+                </div>
+            </div>
+            
           </Section>
         ) : null}
 
@@ -480,14 +479,12 @@ export default function App() {
             <div style={{ color: "var(--wm-muted)", fontSize: 13, marginBottom: 10 }}>
               Use the numeric weights for scale factors. Higher weights increase effort.
             </div>
-            <FormGrid count={6}>
+            <FormGrid count={9}>
               <NumField label={sfLabel("PREC")} value={m.scaleFactors.prec} onChange={(v) => setM({ ...m, scaleFactors: { ...m.scaleFactors, prec: v } })} step={0.01} helpKey="PREC" rangeId="scaleFactors.prec" />
               <NumField label={sfLabel("FLEX")} value={m.scaleFactors.flex} onChange={(v) => setM({ ...m, scaleFactors: { ...m.scaleFactors, flex: v } })} step={0.01} helpKey="FLEX" rangeId="scaleFactors.flex" />
               <NumField label={sfLabel("RESL")} value={m.scaleFactors.resl} onChange={(v) => setM({ ...m, scaleFactors: { ...m.scaleFactors, resl: v } })} step={0.01} helpKey="RESL" rangeId="scaleFactors.resl" />
               <NumField label={sfLabel("TEAM")} value={m.scaleFactors.team} onChange={(v) => setM({ ...m, scaleFactors: { ...m.scaleFactors, team: v } })} step={0.01} helpKey="TEAM" rangeId="scaleFactors.team" />
               <NumField label={sfLabel("PMAT")} value={m.scaleFactors.pmat} onChange={(v) => setM({ ...m, scaleFactors: { ...m.scaleFactors, pmat: v } })} step={0.01} helpKey="PMAT" rangeId="scaleFactors.pmat" />
-
-              {/* Base B locked */}
               <ReadOnlyField
                 label={`${help["B"].title} (Constant)`}
                 value={B_BASE.toFixed(2)}
@@ -497,35 +494,17 @@ export default function App() {
 
             <hr className="hr" />
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-                <FormGrid count={2}>
+                <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontWeight: 700, minWidth: "140px" }}>Σ Scale Factors (ΣSF):</span>
+                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>{fmtNum(r.sumSF)}</span>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>= PREC + FLEX + RESL + TEAM + PMAT</span>
+                </div>
 
-                <ReadOnlyField
-                label="Σ Scale Factors (ΣSF)"
-                value={fmtNum(r.sumSF)}
-                formula={
-                <>
-                Sum of the five scale factor weights.
-
-                ΣSF = PREC + FLEX + RESL + TEAM + PMAT
-                </>
-                }
-                />
-
-                <ReadOnlyField
-                label="Exponent E"
-                value={fmtNum(r.exponentE)}
-                formula={
-                <>
-                Effort exponent used in the COCOMO II effort equation.
-
-                E = B + (0.01 × ΣSF)
-
-                B = 0.91
-                </>
-                }
-                />
-
-                </FormGrid>
+                <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontWeight: 700, minWidth: "100px" }}>Exponent E:</span>
+                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>{fmtNum(r.exponentE)}</span>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>= B + (0.01 × ΣSF)</span>
+                </div>
             </div>
           </Section>
         ) : null}
@@ -571,7 +550,13 @@ export default function App() {
                   </FormGrid>
 
                   <hr className="hr" />
-                  <div style={{ fontWeight: 900, color: "var(--wm-navy)" }}>ΠEM: {fmtNum(r.emProd)}</div>
+                  <div style={{ fontWeight: 900, color: "var(--wm-navy)", display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontWeight: 900, minWidth: "100px" }}>Product of Effort Multipliers:</span>
+                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>ΠEM = {fmtNum(r.emProd)}</span>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>= B + (0.01 × ΣSF)</span>
+                </div>
+                  </div>
                 </>
               );
             })()}
@@ -594,6 +579,13 @@ export default function App() {
             <hr className="hr" />
             <div style={{ fontWeight: 900, color: "var(--wm-navy)", fontSize: 18 }}>
               Total Effort (PM): {fmtNum(round0(r.pm))}
+            <br/>
+            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+
+                <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "16px 24px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
+                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}> Effort formula: • PM = A × (KSLOC ^ E) × EAF</span>
+                </div>
+            </div>
             </div>
           </Section>
         ) : null}
@@ -630,18 +622,6 @@ export default function App() {
                 <div className="k">Non-FTEs (Contractors)</div>
                 <div className="v">{fmtNum(r.contractors)}</div>
                 <div className="s">To cover remaining PM</div>
-              </div>
-              <div className="kpi">
-                <div className="k">Total Dev Hours</div>
-                <div className="v">{fmtNum(round0(r.pm * r.hoursPerPM))}</div>
-                <div className="s">PM × hours/month</div>
-              </div>
-
-              {/* Hours/year display (industry norm) */}
-              <div className="kpi">
-                <div className="k">Assumed Hours / Year</div>
-                <div className="v">{fmtNum(HOURS_PER_YEAR)}</div>
-                <div className="s">Industry norm</div>
               </div>
 
               <div className="kpi">

@@ -87,7 +87,7 @@ export type CocomoInputs = {
  * Industry norm (assumed) annual working hours per resource.
  * Display this on the final step (per your requirement).
  */
-export const HOURS_PER_YEAR = 2080;
+export const HOURS_PER_YEAR = 1800;
 
 /**
  * COCOMO II Post-Architecture Base B coefficient (fixed).
