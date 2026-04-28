@@ -217,8 +217,8 @@ export const help: Record<string, HelpEntry> = {
   rdAllocation: {
     title: "% of total R&D resources allocatable",
     description:
-      "Fraction (0–1) of internal capacity realistically available for this project.",
-    notes: ["Typical: 0.05–0.30 for non-core work; higher for top priority.", "Example: 0.15 = 15% allocation."],
+      "Percentage (0–100%) of internal capacity realistically available for this project.",
+    notes: ["Typical: 5–30% for non-core work; higher for top priority.", "Example: 16% = 16% allocation."],
   },
   avgTotalFTE: {
     title: "Total internal R&D FTE pool",

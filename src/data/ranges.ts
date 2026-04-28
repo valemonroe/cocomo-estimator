@@ -22,7 +22,7 @@ export const RANGES: Record<string, RangeRule> = {
   "assumptions.totalLoc": { min: 1, max: 10_000_000, units: "LOC" },
   "assumptions.avgTotalFTE": { min: 0, max: 10_000, units: "FTE" },
   "assumptions.scheduleMonths": { min: 1, max: 120, units: "months" },
-  "assumptions.rdAllocation": { min: 0, max: 1, units: "0–1" },
+  "assumptions.rdAllocation": { min: 0, max: 100, units: "%" },
 
   // Industry norm: 2,080 hrs/year ≈ 173.3 hrs/month; keep a practical band.
   "assumptions.hoursPerMonth": {
@@ -53,11 +53,11 @@ export const RANGES: Record<string, RangeRule> = {
   // -----------------------------
   // Scale Factors (numeric weights) — Post-Architecture bounds
   // -----------------------------
-  "scaleFactors.prec": { min: 1.24, max: 6.20 },
-  "scaleFactors.flex": { min: 1.01, max: 5.07 },
-  "scaleFactors.resl": { min: 1.41, max: 7.07 },
-  "scaleFactors.team": { min: 1.10, max: 5.48 },
-  "scaleFactors.pmat": { min: 1.56, max: 7.80 },
+  "scaleFactors.prec": { min: 0.00, max: 6.20 },
+  "scaleFactors.flex": { min: 0.00, max: 5.07 },
+  "scaleFactors.resl": { min: 0.00, max: 7.07 },
+  "scaleFactors.team": { min: 0.00, max: 5.48 },
+  "scaleFactors.pmat": { min: 0.00, max: 7.80 },
 
   // -----------------------------
   // Effort Multipliers (numeric multipliers) — Post-Architecture bounds

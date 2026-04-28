@@ -238,7 +238,7 @@ export default function App() {
 
   const steps: { title: string }[] = [
     { title: "1) Assumptions" },
-    { title: "2) Size & ESLOC (Reuse)" },
+    { title: "2) Equivalent Source Lines of Code (ESLOC)" },
     { title: "3) Scale Factors" },
     { title: "4) Effort Multipliers" },
     { title: "5) Calibration" },
@@ -323,37 +323,23 @@ export default function App() {
               />
 
               <NumField
-                label="% of total R&D resources allocatable (0–1)"
-                value={m.assumptions.rdAllocation}
+                label="% of total R&D resources allocatable (0 - 100)"
+                value={m.assumptions.rdAllocation * 100}
                 onChange={(v) =>
                   setM({
                     ...m,
-                    assumptions: { ...m.assumptions, rdAllocation: v },
-                    resources: { ...m.resources, internalAllocation: v },
+                    assumptions: { ...m.assumptions, rdAllocation: v / 100 },
+                    resources: { ...m.resources, internalAllocation: v / 100 },
                   })
                 }
-                step={0.01}
+                step={1}
                 min={0}
-                max={1}
+                max={100}
                 helpKey="rdAllocation"
                 rangeId="assumptions.rdAllocation"
               />
 
-              <NumField
-                label="Hours per month per resource"
-                value={m.assumptions.hoursPerMonth}
-                onChange={(v) =>
-                  setM({
-                    ...m,
-                    assumptions: { ...m.assumptions, hoursPerMonth: v },
-                    resources: { ...m.resources, hoursPerPM: v },
-                  })
-                }
-                step={1}
-                min={1}
-                helpKey="hoursPerMonth"
-                rangeId="assumptions.hoursPerMonth"
-              />
+            
 
               <NumField
                 label="Internal FTE rate low ($/hr)"
@@ -459,7 +445,7 @@ export default function App() {
             <hr className="hr" />
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
                 <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
-                  <span style={{ fontWeight: 700, minWidth: "140px" }}>Adapt. Adj. Factor (AAF):</span>
+                  <span style={{ fontWeight: 700, minWidth: "140px" }}>Adaptation Adjustment Factor  (AAF):</span>
                   <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>{fmtNum(calcAAF(m.esloc.dm,m.esloc.cm,m.esloc.im))}</span>
                   <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}> = (0.4 × DM) + (0.3 × CM) + (0.3 × IM)</span>
                 </div>
@@ -552,9 +538,10 @@ export default function App() {
                   <hr className="hr" />
                   <div style={{ fontWeight: 900, color: "var(--wm-navy)", display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "12px 16px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
-                  <span style={{ fontWeight: 900, minWidth: "100px" }}>Product of Effort Multipliers:</span>
-                  <span style={{ fontWeight: 600, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "60px" }}>ΠEM = {fmtNum(r.emProd)}</span>
-                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>= B + (0.01 × ΣSF)</span>
+                  <span style={{ fontWeight: 900, minWidth: "120px" }}>Product of Effort Multipliers:</span>
+                  <span style={{ fontWeight: 800, color: "var(--wm-navy)", padding: "6px 12px", border: "1px dashed var(--wm-border)", borderRadius: "8px", background: "#f5f7fa", minWidth: "140px" }}>ΠEM = {fmtNum(r.emProd)}</span>
+                  <span style={{fontWeight:600, fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>= RELY × DATA × CPLX × RUSE × DOCU × TIME × STOR × PVOL
+    × ACAP × PCAP × PCON × TOOL × SITE × SCED</span>
                 </div>
                   </div>
                 </>
@@ -578,12 +565,13 @@ export default function App() {
 
             <hr className="hr" />
             <div style={{ fontWeight: 900, color: "var(--wm-navy)", fontSize: 18 }}>
-              Total Effort (PM): {fmtNum(round0(r.pm))}
+              
             <br/>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
 
                 <div style={{ flex: 1, display: "flex", gap: 12, alignItems: "center", background: "#f5f7fa", padding: "16px 24px", borderRadius: "8px", border: "1px solid var(--wm-border)" }}>
-                  <span style={{ fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}> Effort formula: • PM = A × (KSLOC ^ E) × EAF</span>
+                  <span style={{fontWeight:900, fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>Total Effort (PM): {fmtNum(round0(r.pm))}</span>
+                  <span style={{fontWeight:600, fontSize: 13, color: "var(--wm-muted)", whiteSpace: "nowrap" }}>  Effort formula: • PM = A × (KSLOC ^ E) × EAF</span>
                 </div>
             </div>
             </div>
@@ -595,7 +583,7 @@ export default function App() {
             <div className="kpis">
               <div className="kpi">
                 <div className="k">Equivalent Size</div>
-                <div className="v">{fmtNum(round1(r.eslocKsloc))} KSLOC</div>
+                <div className="v">{fmtNum(round1(r.eslocKsloc))} ESLOC</div>
                 <div className="s">From reuse/modernization</div>
               </div>
               <div className="kpi">
