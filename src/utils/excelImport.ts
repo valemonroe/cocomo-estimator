@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import { CocomoInputs } from '../model/cocomo';
 
 /**
- * Parse Excel file and extract COCOMO input data from "Enento estimates with tweaks.xlsx"
+ * Parse Excel file and extract COCOMO input data from xlsx
  * Maps Excel columns to CocomoInputs structure for steps 1-5
  */
 export async function parseExcelFile(file: File): Promise<CocomoInputs> {

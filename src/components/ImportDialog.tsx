@@ -57,7 +57,7 @@ export function ImportDialog({ isOpen, onClose, onImport }: ImportDialogProps) {
         <div style={contentStyle}>
           <p>Select an Excel file (XLSX) to import COCOMO estimates.</p>
           <p style={{ fontSize: 13, color: '#666' }}>
-            Expected file: <strong>Enento estimates with tweaks.xlsx</strong>
+            Expected file: <strong>*.xlsx</strong>
           </p>
 
           <div style={fileInputWrapperStyle}>
