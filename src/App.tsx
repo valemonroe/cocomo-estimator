@@ -9,6 +9,9 @@ import { CocomoInputs, calcAll, calcAAF, round0, round1, HOURS_PER_YEAR, B_BASE 
 // ===== V3 ADDITIONS START: Excel export =====
 import { exportEstimatorToExcel } from "./exportExcel";
 // ===== V3 ADDITIONS END: Excel export =====
+// ===== EXCEL IMPORT: Import dialog =====
+import { ImportDialog } from "./components/ImportDialog";
+// ===== EXCEL IMPORT: END =====
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 // V3 ADDITION — number formatting helper
@@ -211,6 +214,7 @@ function FormGrid({ count, children }: { count: number; children: React.ReactNod
 export default function App() {
   const [step, setStep] = useState<Step>(0);
   const [m, setM] = useState<CocomoInputs>(defaults);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const r = useMemo(() => calcAll(m), [m]);
 
   const stepHasErrors = useMemo(() => {
@@ -643,6 +647,11 @@ export default function App() {
           </button>
 
           <div style={{ display: "flex", gap: 10 }}>
+            {/* ===== EXCEL IMPORT: Import button ===== */}
+            <button className="btn" onClick={() => setImportDialogOpen(true)}>
+              📥 Import Excel
+            </button>
+            {/* ===== EXCEL IMPORT: END ===== */}
             {/* ===== V3 ADDITIONS START: Export button (Final Step only) ===== */}
             {step === 5 ? (
               <button className="btn" onClick={() => exportEstimatorToExcel(m)}>
@@ -672,6 +681,15 @@ export default function App() {
           </div>
         </footer>
       </div>
+      <ImportDialog 
+        isOpen={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        onImport={(data) => {
+          setM(data);
+          setStep(0);
+          setImportDialogOpen(false);
+        }}
+      />
     </>
   );
 }
