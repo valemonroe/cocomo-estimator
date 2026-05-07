@@ -41,3 +41,18 @@ Output is written to `enterprise/bundle/`.
 - Tooltip text is scrollable and wraps, so long help tables are readable.
 - Range validation is enforced per field using `src/data/ranges.ts`.
 - "Next" is disabled when the current step has invalid values.
+
+## RAG benchmark corpus (COCOMO + industry proxies)
+The corpus at `rag/cocomo_benchmark_rag.jsonl` was regenerated as a richer v2 seed set for retrieval pipelines.
+
+What changed:
+- Added a metadata row describing schema expectations and corpus versioning.
+- Expanded canonical COCOMO entries with stable retrieval fields (`kind`, `full_name`, `rating_scale`, `retrieval_tags`).
+- Preserved key COCOMO parameters (DM, CM, IM, RELY, DATA, CPLX, ACAP, PCAP, TOOL, SITE).
+- Kept Jellyfish and Swarmia as **calibration proxies** (not direct EM/SF replacements).
+
+Suggested ingestion:
+- Treat each JSONL line as one chunk/document.
+- Index `parameter`, `category`, `kind`, `retrieval_tags`, `notes`, `authority`, and `source_url`.
+- Prefer `kind=canonical_cocomo` hits for direct parameter values; use `kind=industry_proxy` for calibration context.
+
